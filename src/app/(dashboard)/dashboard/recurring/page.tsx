@@ -97,8 +97,8 @@ export default function RecurringPage() {
       }
       setShowForm(false)
       loadRules()
-    } catch {
-      toast.error("Erro ao salvar recorrência")
+    } catch (e) {
+      toast.error("Erro ao salvar recorrência", { description: e instanceof Error ? e.message : String(e) })
     } finally {
       setSaving(false)
     }
