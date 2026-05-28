@@ -84,8 +84,13 @@ export default function GoalsPage() {
       }
       setShowForm(false)
       reload()
-    } catch {
-      toast.error("Erro ao salvar meta")
+    } catch (e) {
+      const description =
+        e instanceof Error ? e.message
+        : e && typeof e === 'object' && 'message' in e
+          ? String((e as { message: unknown }).message)
+          : JSON.stringify(e)
+      toast.error("Erro ao salvar meta", { description })
     } finally {
       setSaving(false)
     }

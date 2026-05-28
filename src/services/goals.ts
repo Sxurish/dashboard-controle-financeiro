@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
 import type { Goal, CreateGoalInput } from '@/types/app'
+import { emptyStringsToNull } from '@/utils/sanitize'
 
 export async function getGoals(): Promise<Goal[]> {
   const supabase = createClient()
@@ -19,7 +20,7 @@ export async function createGoal(input: CreateGoalInput): Promise<Goal> {
 
   const { data, error } = await supabase
     .from('goals')
-    .insert({ ...input, user_id: user.id, current_amount: input.current_amount || 0 })
+    .insert({ ...emptyStringsToNull(input), user_id: user.id, current_amount: input.current_amount || 0 })
     .select()
     .single()
 
@@ -36,7 +37,7 @@ export async function updateGoal(id: string, input: Partial<CreateGoalInput>): P
   const { error } = await supabase
     .from('goals')
     .update({
-      ...input,
+      ...emptyStringsToNull(input),
       is_completed: current >= target,
       updated_at: new Date().toISOString(),
     })
