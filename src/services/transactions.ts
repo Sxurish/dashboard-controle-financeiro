@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client'
 import type { CreateTransactionInput, TransactionFilters, TransactionWithRelations, PaginatedResult } from '@/types/app'
 import { format, addMonths } from 'date-fns'
+import { emptyStringsToNull } from '@/utils/sanitize'
 
 export async function getTransactions(
   filters: TransactionFilters = {}
@@ -186,7 +187,7 @@ export async function updateTransaction(id: string, input: Partial<CreateTransac
   const { is_installment, installment_count, ...dbFields } = input
   const { error } = await supabase
     .from('transactions')
-    .update({ ...dbFields, updated_at: new Date().toISOString() })
+    .update({ ...emptyStringsToNull(dbFields), updated_at: new Date().toISOString() })
     .eq('id', id)
 
   if (error) throw error

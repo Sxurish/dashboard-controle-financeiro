@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client'
 import type { RecurringRule, CreateRecurringRuleInput } from '@/types/app'
 import { format, addDays, addWeeks, addMonths, addYears, parseISO } from 'date-fns'
+import { emptyStringsToNull } from '@/utils/sanitize'
 
 export async function getRecurringRules(): Promise<RecurringRule[]> {
   const supabase = createClient()
@@ -21,7 +22,7 @@ export async function createRecurringRule(input: CreateRecurringRuleInput): Prom
 
   const { data, error } = await supabase
     .from('recurring_rules')
-    .insert({ ...input, user_id: user.id })
+    .insert({ ...emptyStringsToNull(input), user_id: user.id })
     .select()
     .single()
 
@@ -79,7 +80,7 @@ export async function updateRecurringRule(id: string, input: Partial<CreateRecur
   const supabase = createClient()
   const { error } = await supabase
     .from('recurring_rules')
-    .update({ ...input, updated_at: new Date().toISOString() })
+    .update({ ...emptyStringsToNull(input), updated_at: new Date().toISOString() })
     .eq('id', id)
 
   if (error) throw error
