@@ -110,10 +110,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             href="https://hsbcompany.com.br"
             target="_blank"
             rel="noopener noreferrer"
-            className="transition-colors hover:underline underline-offset-2"
-            style={{ color: '#666' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#999')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#666')}
+            className="text-neutral-500 hover:text-neutral-300 transition-colors hover:underline underline-offset-2"
           >
             HSB Company
           </a>
