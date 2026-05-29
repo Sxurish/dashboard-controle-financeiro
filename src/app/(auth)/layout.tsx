@@ -10,16 +10,16 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="relative z-10">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center">
-              <span className="text-slate-900 font-bold text-lg">M</span>
+              <span className="text-slate-900 font-bold text-lg">A</span>
             </div>
-            <span className="text-white font-semibold text-xl">Moneta</span>
+            <span className="text-white font-semibold text-xl">Arthora</span>
           </div>
         </div>
 
         <div className="relative z-10 space-y-6">
           <blockquote className="space-y-3">
             <p className="text-2xl font-medium text-white leading-relaxed">
-              "O controle financeiro não é sobre restringir sua vida — é sobre criar a vida que você quer."
+              "Wealth in motion."
             </p>
             <footer className="text-slate-400 text-sm">
               Gestão financeira inteligente para pessoas e empresas
@@ -42,7 +42,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         <div className="relative z-10 text-slate-500 text-xs">
-          © {new Date().getFullYear()} Moneta. Todos os direitos reservados.
+          © {new Date().getFullYear()} Arthora. Todos os direitos reservados.
         </div>
       </div>
 
@@ -52,9 +52,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           {/* Mobile logo */}
           <div className="flex items-center gap-2 mb-8 lg:hidden">
             <div className="w-8 h-8 bg-slate-900 dark:bg-white rounded-lg flex items-center justify-center">
-              <span className="text-white dark:text-slate-900 font-bold">M</span>
+              <span className="text-white dark:text-slate-900 font-bold">A</span>
             </div>
-            <span className="font-semibold text-lg">Moneta</span>
+            <span className="font-semibold text-lg">Arthora</span>
           </div>
           {children}
         </div>

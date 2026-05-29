@@ -65,7 +65,7 @@ export default function ReportsPage() {
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `moneta-relatorio-${year}-${String(month).padStart(2, "0")}.csv`
+      a.download = `arthora-relatorio-${year}-${String(month).padStart(2, "0")}.csv`
       a.click()
       URL.revokeObjectURL(url)
       toast.success("Relatório exportado!")

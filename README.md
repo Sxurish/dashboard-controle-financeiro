@@ -1,4 +1,4 @@
-# Moneta — Dashboard de Controle Financeiro
+# Arthora — Wealth in motion.
 
 Dashboard financeiro completo construído com Next.js 14, Supabase e Tailwind CSS. Gerencie receitas, despesas, metas e muito mais com uma interface moderna e responsiva.
 

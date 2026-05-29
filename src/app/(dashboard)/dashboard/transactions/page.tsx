@@ -111,7 +111,7 @@ export default function TransactionsPage() {
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `moneta-lancamentos-${filters.year}-${String(filters.month).padStart(2, "0")}.csv`
+      a.download = `arthora-lancamentos-${filters.year}-${String(filters.month).padStart(2, "0")}.csv`
       a.click()
       URL.revokeObjectURL(url)
       toast.success("CSV exportado!")
