@@ -11,11 +11,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Arthora — Wealth in motion.",
-    template: "%s | Arthora",
+    default: "Kaivo — by HSB Company",
+    template: "%s | Kaivo",
   },
-  description: "Wealth in motion. Gerencie suas finanças com inteligência. Controle receitas, despesas, metas e muito mais.",
-  keywords: ["finanças", "controle financeiro", "dashboard", "receitas", "despesas", "orçamento", "wealth management"],
+  description: "Kaivo, por HSB Company. Gerencie suas finanças com inteligência. Controle receitas, despesas, metas e muito mais.",
+  keywords: ["finanças", "controle financeiro", "dashboard", "receitas", "despesas", "orçamento", "HSB Company", "Kaivo"],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -10,19 +10,22 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="relative z-10">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center">
-              <span className="text-slate-900 font-bold text-lg">A</span>
+              <span className="text-slate-900 font-bold text-lg">K</span>
             </div>
-            <span className="text-white font-semibold text-xl">Arthora</span>
+            <div className="flex flex-col leading-none">
+              <span className="text-white font-semibold text-xl">Kaivo</span>
+              <span className="text-slate-400 text-[11px] tracking-wide">by HSB Company</span>
+            </div>
           </div>
         </div>
 
         <div className="relative z-10 space-y-6">
           <blockquote className="space-y-3">
             <p className="text-2xl font-medium text-white leading-relaxed">
-              "Wealth in motion."
+              "Clareza financeira para decisões mais inteligentes."
             </p>
             <footer className="text-slate-400 text-sm">
-              Gestão financeira inteligente para pessoas e empresas
+              Kaivo · gestão financeira inteligente, by HSB Company
             </footer>
           </blockquote>
 
@@ -42,7 +45,16 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         <div className="relative z-10 text-slate-500 text-xs">
-          © {new Date().getFullYear()} Arthora. Todos os direitos reservados.
+          © {new Date().getFullYear()} Kaivo · um produto{" "}
+          <a
+            href="https://hsbcompany.com.br"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-slate-400 hover:text-white transition-colors underline-offset-2 hover:underline"
+          >
+            HSB Company
+          </a>
+          . Todos os direitos reservados.
         </div>
       </div>
 
@@ -52,9 +64,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           {/* Mobile logo */}
           <div className="flex items-center gap-2 mb-8 lg:hidden">
             <div className="w-8 h-8 bg-slate-900 dark:bg-white rounded-lg flex items-center justify-center">
-              <span className="text-white dark:text-slate-900 font-bold">A</span>
+              <span className="text-white dark:text-slate-900 font-bold">K</span>
             </div>
-            <span className="font-semibold text-lg">Arthora</span>
+            <div className="flex flex-col leading-none">
+              <span className="font-semibold text-lg">Kaivo</span>
+              <span className="text-[10px] text-muted-foreground tracking-wide">by HSB Company</span>
+            </div>
           </div>
           {children}
         </div>

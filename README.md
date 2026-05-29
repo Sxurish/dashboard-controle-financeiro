@@ -1,4 +1,4 @@
-# Arthora — Wealth in motion.
+# Kaivo — by HSB Company
 
 Dashboard financeiro completo construído com Next.js 14, Supabase e Tailwind CSS. Gerencie receitas, despesas, metas e muito mais com uma interface moderna e responsiva.
 

@@ -53,9 +53,12 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         <div className="flex items-center justify-between h-16 px-6 border-b flex-shrink-0">
           <Link href="/dashboard" className="flex items-center gap-2.5" onClick={onClose}>
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-primary-foreground font-bold text-base">A</span>
+              <span className="text-primary-foreground font-bold text-base">K</span>
             </div>
-            <span className="font-semibold text-lg">Arthora</span>
+            <div className="flex flex-col leading-none">
+              <span className="font-semibold text-lg">Kaivo</span>
+              <span className="text-[10px] text-muted-foreground tracking-wide">by HSB Company</span>
+            </div>
           </Link>
           {onClose && (
             <Button variant="ghost" size="icon" className="lg:hidden h-8 w-8" onClick={onClose}>
