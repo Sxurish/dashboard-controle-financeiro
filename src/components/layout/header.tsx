@@ -92,7 +92,12 @@ export function Header({ onMenuClick }: HeaderProps) {
             <Button variant="ghost" className="h-9 px-2 gap-2">
               <Avatar className="h-7 w-7">
                 <AvatarImage src={user?.avatar_url} />
-                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                <AvatarFallback
+                  className="text-xs text-white"
+                  style={{ background: 'linear-gradient(135deg, #FF6B00, #E91E8C, #7B2FBE)' }}
+                >
+                  {initials}
+                </AvatarFallback>
               </Avatar>
               <span className="hidden md:block text-sm font-medium max-w-[120px] truncate">
                 {user?.full_name || user?.email?.split("@")[0] || "Usuário"}

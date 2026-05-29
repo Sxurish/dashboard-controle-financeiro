@@ -11,8 +11,8 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 25 100% 50%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
@@ -23,7 +23,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
+    --ring: 25 100% 50%;
     --radius: 0.625rem;
     --success: 142 76% 36%;
     --success-foreground: 0 0% 98%;
@@ -36,25 +36,25 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%;
+    --background: 0 0% 5%;
     --foreground: 0 0% 98%;
-    --card: 240 10% 5.5%;
+    --card: 0 0% 8%;
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 5.5%;
+    --popover: 0 0% 8%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
+    --primary: 25 100% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 13%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 55%;
+    --accent: 0 0% 15%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 25 100% 55%;
     --success: 142 69% 45%;
     --success-foreground: 0 0% 98%;
     --warning: 38 92% 55%;
@@ -81,6 +81,13 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .kaivo-gradient-text {
+    background: linear-gradient(135deg, #FF6B00 0%, #E91E8C 50%, #7B2FBE 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .scrollbar-thin {

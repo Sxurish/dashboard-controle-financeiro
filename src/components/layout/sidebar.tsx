@@ -52,12 +52,25 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         {/* Logo */}
         <div className="flex items-center justify-between h-16 px-6 border-b flex-shrink-0">
           <Link href="/dashboard" className="flex items-center gap-2.5" onClick={onClose}>
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-primary-foreground font-bold text-base">K</span>
+            {/* Gradient box with white K SVG */}
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ background: 'linear-gradient(135deg, #FF6B00, #E91E8C, #7B2FBE)' }}
+            >
+              <svg viewBox="0 0 100 100" className="w-[18px] h-[18px]" fill="none">
+                <path d="M22 12L22 86" stroke="white" strokeWidth="12" strokeLinecap="round" />
+                <path d="M22 36L78 10" stroke="white" strokeWidth="10" strokeLinecap="round" />
+                <path d="M22 50L55 30" stroke="white" strokeWidth="8" strokeLinecap="round" />
+                <path d="M22 50L55 70" stroke="white" strokeWidth="8" strokeLinecap="round" />
+                <path d="M22 64L78 90" stroke="white" strokeWidth="10" strokeLinecap="round" />
+                <circle cx="78" cy="10" r="7" fill="white" />
+                <circle cx="78" cy="90" r="7" fill="white" />
+                <circle cx="22" cy="87" r="5" fill="white" />
+              </svg>
             </div>
             <div className="flex flex-col leading-none">
-              <span className="font-semibold text-lg">Kaivo</span>
-              <span className="text-[10px] text-muted-foreground tracking-wide">by HSB Company</span>
+              <span className="font-bold text-lg tracking-tight kaivo-gradient-text">kaivo</span>
+              <span className="text-[9px] text-muted-foreground tracking-widest uppercase">by HSB Company</span>
             </div>
           </Link>
           {onClose && (
@@ -78,10 +91,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   key={item.href}
                   href={item.href}
                   onClick={onClose}
+                  style={isActive ? { background: 'linear-gradient(135deg, rgba(255,107,0,0.13) 0%, rgba(233,30,140,0.10) 50%, rgba(123,47,190,0.08) 100%)' } : undefined}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150",
                     isActive
-                      ? "bg-primary text-primary-foreground shadow-sm"
+                      ? "text-foreground font-semibold"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent"
                   )}
                 >
@@ -102,10 +116,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 onClick={onClose}
+                style={isActive ? { background: 'linear-gradient(135deg, rgba(255,107,0,0.13) 0%, rgba(233,30,140,0.10) 50%, rgba(123,47,190,0.08) 100%)' } : undefined}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150",
                   isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
+                    ? "text-foreground font-semibold"
                     : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 )}
               >
