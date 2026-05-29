@@ -36,6 +36,26 @@ function CustomTooltip({ active, payload, label }: { active?: boolean; payload?:
   )
 }
 
+function niceMax(value: number): number {
+  if (value <= 0) return 1000
+  const magnitude = Math.pow(10, Math.floor(Math.log10(value)))
+  const step = magnitude >= 1000 ? magnitude : magnitude * 10
+  return Math.ceil(value / step) * step
+}
+
+function formatYTick(value: number): string {
+  if (value === 0) return 'R$0'
+  if (value >= 1_000_000) {
+    const v = value / 1_000_000
+    return `R$${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}M`
+  }
+  if (value >= 1_000) {
+    const v = value / 1_000
+    return `R$${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}k`
+  }
+  return `R$${value.toFixed(0)}`
+}
+
 export function RevenueExpenseChart({ data, loading }: RevenueExpenseChartProps) {
   if (loading) {
     return (
@@ -55,6 +75,9 @@ export function RevenueExpenseChart({ data, loading }: RevenueExpenseChartProps)
     ...d,
     balance: d.income - d.expense,
   }))
+
+  const maxValue = Math.max(...chartData.map(d => Math.max(d.income, d.expense, Math.abs(d.balance))), 0)
+  const yMax = niceMax(maxValue)
 
   return (
     <Card>
@@ -77,7 +100,9 @@ export function RevenueExpenseChart({ data, loading }: RevenueExpenseChartProps)
               tick={{ fontSize: 11 }}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(v) => `R$${(v/1000).toFixed(0)}k`}
+              tickFormatter={formatYTick}
+              domain={[0, yMax]}
+              tickCount={6}
               className="fill-muted-foreground"
             />
             <Tooltip content={<CustomTooltip />} />
