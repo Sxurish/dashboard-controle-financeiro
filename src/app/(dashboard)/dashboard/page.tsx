@@ -16,6 +16,8 @@ import {
 } from "@/hooks/use-transactions"
 import { useAccounts } from "@/hooks/use-accounts"
 import { getOverdueTransactions } from "@/services/transactions"
+import { needsOnboarding } from "@/services/onboarding"
+import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard"
 import { formatCurrency } from "@/utils/currency"
 import {
   Select,
@@ -31,6 +33,13 @@ export default function DashboardPage() {
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth() + 1)
   const [alerts, setAlerts] = useState<FinancialAlert[]>([])
+  const [showOnboarding, setShowOnboarding] = useState(false)
+
+  useEffect(() => {
+    needsOnboarding().then(needs => {
+      if (needs) setShowOnboarding(true)
+    })
+  }, [])
 
   const { kpis, loading: kpisLoading } = useDashboardKPIs(year, month)
   const { data: chartData, loading: chartLoading } = useChartData(year)
@@ -68,6 +77,11 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <OnboardingWizard
+        open={showOnboarding}
+        onComplete={() => { setShowOnboarding(false); window.location.reload() }}
+      />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
