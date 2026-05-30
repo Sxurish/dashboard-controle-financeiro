@@ -3,7 +3,8 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard, ArrowLeftRight, Tag, Wallet, CreditCard, Target,
-  BarChart3, Settings, X, RefreshCcw, PiggyBank, Upload, Crown
+  BarChart3, Settings, X, RefreshCcw, PiggyBank, Upload, Crown, Landmark,
+  TrendingUp, Sparkles,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -19,6 +20,9 @@ const navItems = [
   { href: "/dashboard/recurring", label: "Recorrências", icon: RefreshCcw },
   { href: "/dashboard/budget", label: "Orçamento", icon: PiggyBank },
   { href: "/dashboard/goals", label: "Metas", icon: Target },
+  { href: "/dashboard/cashflow", label: "Fluxo de caixa", icon: TrendingUp },
+  { href: "/dashboard/insights", label: "Insights", icon: Sparkles },
+  { href: "/dashboard/open-finance", label: "Open Finance", icon: Landmark },
   { href: "/dashboard/reports", label: "Relatórios", icon: BarChart3 },
 ]
 
