@@ -1,12 +1,13 @@
 "use client"
 import { useState, useEffect } from "react"
-import { Plus, CreditCard, Pencil, Trash2, AlertCircle } from "lucide-react"
+import { Plus, CreditCard, Pencil, Trash2, AlertCircle, Receipt, CheckCircle2, RotateCcw, Calendar } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import {
   getCreditCards, createCreditCard, updateCreditCard, deleteCreditCard,
-  getCardInvoices, getCardUsedLimit
+  getCardInvoicesComputed, computeUsedLimit, payInvoice, unpayInvoice,
+  type ComputedInvoice,
 } from "@/services/credit-cards"
 import { creditCardSchema, type CreditCardFormValues } from "@/schemas/credit-card.schema"
 import { PageHeader } from "@/components/shared/page-header"
@@ -26,7 +27,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatCurrency } from "@/utils/currency"
-import type { CreditCard as CreditCardType, CreditCardInvoice } from "@/types/app"
+import { formatDate } from "@/utils/date"
+import type { CreditCard as CreditCardType } from "@/types/app"
 import { cn } from "@/lib/utils"
 
 const CARD_COLORS = [
@@ -36,11 +38,16 @@ const CARD_COLORS = [
 
 const CARD_BRANDS = ["Visa", "Mastercard", "Elo", "American Express", "Hipercard", "Outros"]
 
-const invoiceStatusLabels: Record<string, string> = {
-  open: "Aberta", closed: "Fechada", paid: "Paga"
+const invoiceStatusLabels: Record<ComputedInvoice["status"], string> = {
+  open: "Aberta", closed: "Fechada", paid: "Paga",
 }
-const invoiceStatusVariants: Record<string, "pending" | "warning" | "success"> = {
-  open: "pending", closed: "warning", paid: "success"
+const invoiceStatusVariants: Record<ComputedInvoice["status"], "pending" | "warning" | "success"> = {
+  open: "pending", closed: "warning", paid: "success",
+}
+
+interface CardData {
+  usedLimit: number
+  invoices: ComputedInvoice[]
 }
 
 export default function CreditCardsPage() {
@@ -50,7 +57,11 @@ export default function CreditCardsPage() {
   const [editingCard, setEditingCard] = useState<CreditCardType | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
-  const [cardDetails, setCardDetails] = useState<Record<string, { usedLimit: number; invoices: CreditCardInvoice[] }>>({})
+  const [cardData, setCardData] = useState<Record<string, CardData>>({})
+
+  // Invoice detail dialog
+  const [viewing, setViewing] = useState<{ card: CreditCardType; invoice: ComputedInvoice } | null>(null)
+  const [paying, setPaying] = useState(false)
 
   const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<CreditCardFormValues>({
     resolver: zodResolver(creditCardSchema),
@@ -64,15 +75,12 @@ export default function CreditCardsPage() {
     try {
       const c = await getCreditCards()
       setCards(c)
-      const details: Record<string, { usedLimit: number; invoices: CreditCardInvoice[] }> = {}
+      const data: Record<string, CardData> = {}
       await Promise.all(c.map(async (card) => {
-        const [usedLimit, invoices] = await Promise.all([
-          getCardUsedLimit(card.id),
-          getCardInvoices(card.id),
-        ])
-        details[card.id] = { usedLimit, invoices }
+        const invoices = await getCardInvoicesComputed(card)
+        data[card.id] = { usedLimit: computeUsedLimit(invoices), invoices }
       }))
-      setCardDetails(details)
+      setCardData(data)
     } catch {
       toast.error("Erro ao carregar cartões")
     } finally {
@@ -133,6 +141,31 @@ export default function CreditCardsPage() {
     }
   }
 
+  async function handlePay() {
+    if (!viewing) return
+    setPaying(true)
+    try {
+      if (viewing.invoice.status === "paid") {
+        await unpayInvoice(viewing.card, viewing.invoice.referenceMonth)
+        toast.success("Fatura reaberta")
+      } else {
+        await payInvoice(viewing.card, viewing.invoice)
+        toast.success("Fatura marcada como paga! 🎉")
+      }
+      setViewing(null)
+      loadCards()
+    } catch {
+      toast.error("Erro ao atualizar fatura")
+    } finally {
+      setPaying(false)
+    }
+  }
+
+  /** The invoice that's currently "the bill to look at": first unpaid, else most recent. */
+  function currentInvoice(invoices: ComputedInvoice[]): ComputedInvoice | undefined {
+    return invoices.find(i => i.status !== "paid" && i.total > 0) || invoices.find(i => i.total > 0) || invoices[0]
+  }
+
   return (
     <div className="space-y-6 animate-fade-in">
       <PageHeader title="Cartões de Crédito" description="Gerencie seus cartões e faturas">
@@ -159,10 +192,11 @@ export default function CreditCardsPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {cards.map(card => {
-            const details = cardDetails[card.id]
-            const usedPct = details ? Math.min((details.usedLimit / card.limit) * 100, 100) : 0
-            const available = card.limit - (details?.usedLimit || 0)
-            const latestInvoice = details?.invoices?.[0]
+            const data = cardData[card.id]
+            const usedLimit = data?.usedLimit || 0
+            const usedPct = card.limit > 0 ? Math.min((usedLimit / card.limit) * 100, 100) : 0
+            const available = card.limit - usedLimit
+            const invoice = data ? currentInvoice(data.invoices) : undefined
 
             return (
               <Card key={card.id} className="overflow-hidden hover:shadow-md transition-shadow">
@@ -212,7 +246,7 @@ export default function CreditCardsPage() {
                       className={cn("h-2", usedPct > 80 ? "text-red-500" : "")}
                     />
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>Usado: {formatCurrency(details?.usedLimit || 0)}</span>
+                      <span>Usado: {formatCurrency(usedLimit)}</span>
                       <span className={available < 0 ? "text-destructive font-medium" : ""}>
                         Disponível: {formatCurrency(Math.max(available, 0))}
                       </span>
@@ -228,20 +262,50 @@ export default function CreditCardsPage() {
 
                   <Separator />
 
-                  {/* Latest invoice */}
-                  {latestInvoice ? (
-                    <div className="flex items-center justify-between">
+                  {/* Current invoice */}
+                  {invoice && invoice.total > 0 ? (
+                    <button
+                      onClick={() => setViewing({ card, invoice })}
+                      className="w-full flex items-center justify-between text-left hover:bg-muted/50 -mx-2 px-2 py-1.5 rounded-lg transition-colors"
+                    >
                       <div>
-                        <p className="text-xs text-muted-foreground">Fatura atual</p>
-                        <p className="font-semibold">{formatCurrency(latestInvoice.total_amount)}</p>
-                        <p className="text-xs text-muted-foreground">Vence: {latestInvoice.due_date}</p>
+                        <p className="text-xs text-muted-foreground">Fatura {invoice.label}</p>
+                        <p className="font-semibold">{formatCurrency(invoice.total)}</p>
+                        <p className="text-xs text-muted-foreground">Vence: {formatDate(invoice.dueDate)}</p>
                       </div>
-                      <Badge variant={invoiceStatusVariants[latestInvoice.status] as "pending" | "income" | "expense" | "transfer" | "success" | "warning" | "overdue" | "default" | "secondary" | "destructive" | "outline"}>
-                        {invoiceStatusLabels[latestInvoice.status]}
-                      </Badge>
-                    </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={invoiceStatusVariants[invoice.status]}>
+                          {invoiceStatusLabels[invoice.status]}
+                        </Badge>
+                        <Receipt className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </button>
                   ) : (
-                    <p className="text-xs text-muted-foreground">Nenhuma fatura encontrada</p>
+                    <p className="text-xs text-muted-foreground">Nenhuma compra nesta fatura</p>
+                  )}
+
+                  {/* Invoice history */}
+                  {data && data.invoices.filter(i => i.total > 0).length > 1 && (
+                    <div className="space-y-1 pt-1">
+                      <p className="text-xs font-medium text-muted-foreground">Outras faturas</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {data.invoices
+                          .filter(i => i.total > 0 && i.referenceMonth !== invoice?.referenceMonth)
+                          .slice(0, 5)
+                          .map(inv => (
+                            <button
+                              key={inv.referenceMonth}
+                              onClick={() => setViewing({ card, invoice: inv })}
+                              className={cn(
+                                "text-xs px-2 py-1 rounded-md border transition-colors hover:bg-muted",
+                                inv.status === "paid" ? "text-muted-foreground" : "font-medium"
+                              )}
+                            >
+                              {inv.label} · {formatCurrency(inv.total)}
+                            </button>
+                          ))}
+                      </div>
+                    </div>
                   )}
 
                   <div className="flex justify-between text-xs text-muted-foreground">
@@ -318,6 +382,78 @@ export default function CreditCardsPage() {
               <Button type="submit" disabled={saving}>{saving ? "Salvando..." : editingCard ? "Atualizar" : "Criar"}</Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invoice detail dialog */}
+      <Dialog open={!!viewing} onOpenChange={(v) => !v && setViewing(null)}>
+        <DialogContent className="max-w-lg">
+          {viewing && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Receipt className="h-5 w-5" />
+                  Fatura {viewing.invoice.label} · {viewing.card.name}
+                </DialogTitle>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="bg-muted/50 rounded-lg p-3">
+                    <p className="text-xs text-muted-foreground">Total</p>
+                    <p className="font-bold text-sm mt-0.5">{formatCurrency(viewing.invoice.total)}</p>
+                  </div>
+                  <div className="bg-muted/50 rounded-lg p-3">
+                    <p className="text-xs text-muted-foreground flex items-center justify-center gap-1"><Calendar className="h-3 w-3" />Fecha</p>
+                    <p className="font-medium text-sm mt-0.5">{formatDate(viewing.invoice.closeDate)}</p>
+                  </div>
+                  <div className="bg-muted/50 rounded-lg p-3">
+                    <p className="text-xs text-muted-foreground flex items-center justify-center gap-1"><Calendar className="h-3 w-3" />Vence</p>
+                    <p className="font-medium text-sm mt-0.5">{formatDate(viewing.invoice.dueDate)}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Badge variant={invoiceStatusVariants[viewing.invoice.status]}>
+                    {invoiceStatusLabels[viewing.invoice.status]}
+                  </Badge>
+                  {viewing.invoice.paidAt && (
+                    <span className="text-xs text-muted-foreground">Paga em {formatDate(viewing.invoice.paidAt)}</span>
+                  )}
+                </div>
+
+                <Separator />
+
+                <div className="space-y-1 max-h-64 overflow-y-auto">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">
+                    {viewing.invoice.transactions.length} lançamento(s)
+                  </p>
+                  {viewing.invoice.transactions.map(t => (
+                    <div key={t.id} className="flex items-center justify-between py-1.5 text-sm">
+                      <div className="min-w-0">
+                        <p className="truncate">{t.description}</p>
+                        <p className="text-xs text-muted-foreground">{formatDate(t.date)}</p>
+                      </div>
+                      <span className="font-medium tabular-nums ml-2">{formatCurrency(t.amount)}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <Button
+                  onClick={handlePay}
+                  disabled={paying || viewing.invoice.total === 0}
+                  variant={viewing.invoice.status === "paid" ? "outline" : "default"}
+                  className="w-full"
+                >
+                  {viewing.invoice.status === "paid" ? (
+                    <><RotateCcw className="h-4 w-4" /> Reabrir fatura</>
+                  ) : (
+                    <><CheckCircle2 className="h-4 w-4" /> Marcar como paga</>
+                  )}
+                </Button>
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
 

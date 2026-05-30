@@ -8,6 +8,7 @@ import { transactionSchema, type TransactionFormValues } from "@/schemas/transac
 import { createTransaction, updateTransaction } from "@/services/transactions"
 import { getAccounts } from "@/services/accounts"
 import { getCategories } from "@/services/categories"
+import { getCreditCards } from "@/services/credit-cards"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,7 +18,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import type { Account, Category, TransactionWithRelations } from "@/types/app"
+import type { Account, Category, CreditCard, TransactionWithRelations } from "@/types/app"
 
 interface TransactionFormProps {
   transaction?: TransactionWithRelations | null
@@ -30,6 +31,7 @@ export function TransactionForm({ transaction, defaultType = "expense", onSucces
   const [loading, setLoading] = useState(false)
   const [accounts, setAccounts] = useState<Account[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+  const [creditCards, setCreditCards] = useState<CreditCard[]>([])
   const [activeTab, setActiveTab] = useState<"income" | "expense" | "transfer">(
     transaction?.type || defaultType
   )
@@ -44,6 +46,7 @@ export function TransactionForm({ transaction, defaultType = "expense", onSucces
       description: transaction?.description || "",
       category_id: transaction?.category_id || null,
       account_id: transaction?.account_id || "",
+      credit_card_id: transaction?.credit_card_id || null,
       payment_method: transaction?.payment_method || null,
       notes: transaction?.notes || "",
       is_installment: false,
@@ -53,11 +56,13 @@ export function TransactionForm({ transaction, defaultType = "expense", onSucces
 
   const isInstallment = watch("is_installment")
   const transactionType = watch("type")
+  const selectedCardId = watch("credit_card_id")
 
   useEffect(() => {
-    Promise.all([getAccounts(), getCategories()]).then(([accs, cats]) => {
+    Promise.all([getAccounts(), getCategories(), getCreditCards()]).then(([accs, cats, cards]) => {
       setAccounts(accs)
       setCategories(cats)
+      setCreditCards(cards)
     })
   }, [])
 
@@ -213,6 +218,30 @@ export function TransactionForm({ transaction, defaultType = "expense", onSucces
                 <SelectItem value="cash">Dinheiro</SelectItem>
                 <SelectItem value="bank_transfer">Transferência bancária</SelectItem>
                 <SelectItem value="other">Outro</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {activeTab === "expense" && creditCards.length > 0 && (
+          <div className="space-y-1.5 col-span-2 sm:col-span-1">
+            <Label>Cartão de crédito</Label>
+            <Select
+              value={selectedCardId || "none"}
+              onValueChange={(v) => {
+                const cardId = v === "none" ? null : v
+                setValue("credit_card_id", cardId)
+                if (cardId) setValue("payment_method", "credit_card")
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="À vista (sem cartão)" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">À vista (sem cartão)</SelectItem>
+                {creditCards.map(c => (
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
