@@ -3,7 +3,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard, ArrowLeftRight, Tag, Wallet, CreditCard, Target,
-  BarChart3, Settings, X, RefreshCcw
+  BarChart3, Settings, X, RefreshCcw, PiggyBank
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -16,6 +16,7 @@ const navItems = [
   { href: "/dashboard/credit-cards", label: "Cartões", icon: CreditCard },
   { href: "/dashboard/categories", label: "Categorias", icon: Tag },
   { href: "/dashboard/recurring", label: "Recorrências", icon: RefreshCcw },
+  { href: "/dashboard/budget", label: "Orçamento", icon: PiggyBank },
   { href: "/dashboard/goals", label: "Metas", icon: Target },
   { href: "/dashboard/reports", label: "Relatórios", icon: BarChart3 },
 ]
