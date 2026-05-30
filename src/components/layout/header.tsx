@@ -1,7 +1,8 @@
 "use client"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Menu, Bell, Sun, Moon, Monitor, LogOut, User } from "lucide-react"
+import { Menu, Sun, Moon, Monitor, LogOut, User } from "lucide-react"
+import { NotificationBell } from "@/components/layout/notification-bell"
 import { useTheme } from "next-themes"
 import { toast } from "sonner"
 import { createClient } from "@/lib/supabase/client"
@@ -66,6 +67,9 @@ export function Header({ onMenuClick }: HeaderProps) {
       <div className="flex-1 lg:flex-none" />
 
       <div className="flex items-center gap-2">
+        {/* Notifications */}
+        <NotificationBell />
+
         {/* Theme toggle */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
